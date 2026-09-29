@@ -18,26 +18,51 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script>
       // Suppress Vite development HMR WebSocket disconnection errors in AI Studio iframe environment
-      window.addEventListener('unhandledrejection', function (event) {
-        var reason = event.reason;
-        var message = (reason && (reason.message || reason.toString())) || '';
-        if (
-          message.indexOf('WebSocket closed without opened') !== -1 ||
-          message.indexOf('[vite] failed to connect to websocket') !== -1 ||
-          message.indexOf('WebSocket') !== -1
-        ) {
-          event.preventDefault();
-        }
-      });
-      window.addEventListener('error', function (event) {
-        var message = event.message || '';
-        if (
-          message.indexOf('WebSocket closed without opened') !== -1 ||
-          message.indexOf('[vite] failed to connect to websocket') !== -1
-        ) {
-          event.preventDefault();
-        }
-      });
+      (function() {
+        var isWsError = function(str) {
+          if (!str) return false;
+          var s = String(str);
+          return (
+            s.indexOf('WebSocket closed without opened') !== -1 ||
+            s.indexOf('[vite] failed to connect to websocket') !== -1 ||
+            s.indexOf('failed to connect to websocket') !== -1 ||
+            s.indexOf('WebSocket') !== -1
+          );
+        };
+
+        window.addEventListener('unhandledrejection', function (event) {
+          var reason = event.reason;
+          var message = (reason && (reason.message || reason.stack || reason.toString())) || '';
+          if (isWsError(message)) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }, true);
+
+        window.addEventListener('error', function (event) {
+          var message = (event && (event.message || event.error && event.error.message)) || '';
+          if (isWsError(message)) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }, true);
+
+        var origError = console.error;
+        console.error = function() {
+          var args = Array.prototype.slice.call(arguments);
+          var joined = args.map(function(a) { return (a && a.message) || String(a); }).join(' ');
+          if (isWsError(joined)) return;
+          origError.apply(console, arguments);
+        };
+
+        var origWarn = console.warn;
+        console.warn = function() {
+          var args = Array.prototype.slice.call(arguments);
+          var joined = args.map(function(a) { return (a && a.message) || String(a); }).join(' ');
+          if (isWsError(joined)) return;
+          origWarn.apply(console, arguments);
+        };
+      })();
     </script>
   </head>
   <body class="bg-slate-950 text-slate-100 antialiased select-none sm:select-auto">
