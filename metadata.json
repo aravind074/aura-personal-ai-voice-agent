@@ -1,0 +1,6 @@
+{
+  "name": "AURA — Personal AI Voice Agent",
+  "description": "Your intelligent voice-powered personal assistant",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

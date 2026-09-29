@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "Task": {
+      "title": "Task",
+      "description": "A scheduled or pending user todo task",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "in_progress", "completed"] },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "urgent"] },
+        "dueDate": { "type": "string" },
+        "category": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["id", "title", "status"]
+    },
+    "Reminder": {
+      "title": "Reminder",
+      "description": "A time-triggered reminder notification",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "datetime": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "triggered": { "type": "boolean" },
+        "priority": { "type": "string" }
+      },
+      "required": ["id", "title", "datetime"]
+    },
+    "CalendarEvent": {
+      "title": "CalendarEvent",
+      "description": "A calendar schedule event",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "category": { "type": "string" },
+        "location": { "type": "string" }
+      },
+      "required": ["id", "title", "startTime", "endTime"]
+    },
+    "Note": {
+      "title": "Note",
+      "description": "User notes and research summaries",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "category": { "type": "string" },
+        "tags": { "type": "array" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "title", "content"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "User specific task items"
+    },
+    "/users/{userId}/reminders/{reminderId}": {
+      "schema": "Reminder",
+      "description": "User specific reminder alerts"
+    },
+    "/users/{userId}/events/{eventId}": {
+      "schema": "CalendarEvent",
+      "description": "User calendar events"
+    },
+    "/users/{userId}/notes/{noteId}": {
+      "schema": "Note",
+      "description": "User notes and documentation"
+    }
+  }
+}
